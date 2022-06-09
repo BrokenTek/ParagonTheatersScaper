@@ -16,7 +16,7 @@ from seat_check import scrapeSeats
 # add method to write to file
 def writeToFile(lyst):
 	f = open('lux_box_seats.txt', 'w')
-	for i in range(len(lyst), 0, -1):
+	for i in range(len(lyst)-1, 0, -1):
 		f.write(lyst[i].getMovieName())
 		f.write("\n")
 		f.write(lyst[i].getMovieTime())
