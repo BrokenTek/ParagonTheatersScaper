@@ -16,8 +16,18 @@ from seat_check import scrapeSeats
 # add method to write to file
 def writeToFile(lyst):
 	f = open('lux_box_seats.txt', 'w')
-	for i in lyst:
-		f.writelines(i)
+	for i in range(len(lyst), 0, -1):
+		f.write(lyst[i].getMovieName())
+		f.write("\n")
+		f.write(lyst[i].getMovieTime())
+		f.write("\n")
+		f.write("Theater Number: ")
+		f.write(str(lyst[i].getTheaterNum()))
+		f.write("\n")
+		f.write("Lux Box Seats:")
+		f.write(str(lyst[i].getSoldSeats()))
+		f.write("\n")
+		f.write("\n")
 	
 	
 def main():
@@ -75,6 +85,8 @@ def main():
 	for i in list_of_movies:
 		print(i)
 		print()
+		
+	writeToFile(list_of_movies)	
 
 if __name__ == "__main__":
 	main()
