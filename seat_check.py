@@ -11,6 +11,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from bs4 import BeautifulSoup as bs
+import requests
 import time
 
 # This function performs one scrape on one showtime. This function should be used in an iteration over each movies showtimes
@@ -18,14 +20,15 @@ def scrapeSeats(movie, section, movie_time, url):
 	'''
 	Must change path to the correct location of chromedriver.exe if using code pulled from github. Current version
 		being used is v102 for Chrome version 102
+	driver = webdriver.Chrome("D:\Code_Practice\python_modules\selenium_v101\chromedriver.exe")
 	'''
-	#driver = webdriver.Chrome("D:\Code_Practice\python_modules\selenium_v101\chromedriver.exe")
+	
 	driver = webdriver.Chrome(".\chromedriver.exe")
 
 	purl = url
 	driver.get(purl)
 
-	# gets all movies, the theater showtimes are children of showtimes_movie called 'comment'
+	# Gets all movies, the theater showtimes are children of showtimes_movie called 'comment'
 	showtimes = driver.find_elements(By.ID, "showtimes_movie")
 
 	movie = int(movie)
@@ -66,31 +69,30 @@ def scrapeSeats(movie, section, movie_time, url):
 	btn.click()
 	next_btn = driver.find_element(By.ID, "ibtnOrderTickets")
 	next_btn.click()
-
 	time.sleep(1)
 
-	# Find the luxbox seating section
-	lux_seats = driver.find_element(By.ID, section_id)
-	tbody = lux_seats.find_element(By.TAG_NAME, "tbody")
-	trs = tbody.find_elements(By.TAG_NAME, "tr")
+	page_source = driver.page_source
+	soup = bs(page_source, 'html.parser')
+
+	lux_section = soup.find(id=section_id)
+	rows = lux_section.find_all("tr")
 
 	sold_seats = 0
 
-	'''
-	Scrapes each row of luxbox seating to find the data-type attribute. If that attributes
-		value is 'Sold', then the sold_seats variable will be incremented.
-	'''
-	for tr in trs:
-		tds = tr.find_elements(By.TAG_NAME, "td")
+	for row in rows:
+		tds = row.find_all("td")
 		for td in tds:
 			if len(td.text.strip()) > 0:
-				#img = td.get_attribute('img')
-				img = td.find_element(By.TAG_NAME, "img")
-				data = img.get_attribute("data-type")
-				if data == "Sold":
-					sold_seats+=1
+				seat_value = td.find("img")["data-type"]
+				if seat_value.strip() == "Sold":
+					sold_seats += 1
+	
+	# Cancels the order to not trick the website into thinking there is an open order to reserve the seat
+	cancel_btn = driver.find_element(By.CLASS_NAME, "clear")
+	cancel_btn.click()
 
-	return movie_name, showing_time, theater_num, sold_seats				
+	time.sleep(1)
 
 	driver.quit()
+	return movie_name, showing_time, theater_num, sold_seats
 
