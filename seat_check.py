@@ -1,6 +1,6 @@
 '''
 	Author: Carson Pribble
-	File: main.py
+	File: scrape_seats.py
 	Purpose: Scrape each movie at paragontheaters website at the Parkside location for the number of 'LuxBox' 
 		seats that are sold when the program is run. This automates a task that takes an employee
 		around 20 minutes to complete every hour and is very useful for busy weekend days.
